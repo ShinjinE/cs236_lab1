@@ -46,7 +46,8 @@ void Scanner::Lex(){
             isSymbol(next);
         }
     }
-    //lineNum++;
+    if(lineNum != 1)
+        lineNum++;
     //file->get(next);
     token.push_back(new Token(ENDOF, "", lineNum));
 }
@@ -106,11 +107,15 @@ void Scanner::isString(char next){
     while(file->peek() != '\''){
         file->get(next);
         strng += next;
+        if(next == '\n'){
+            lineNum++;
+            cout << strng << lineNum << endl;
+        }
         if (file->peek() == EOF){
             token.push_back(new Token(UNDEFINED, strng, startLineNum));
             return;
         }
-        else if (file->peek() == '\''){
+        if (file->peek() == '\''){
             file->get(next);
             strng += next;
             if (file->peek() != '\''){
@@ -119,9 +124,6 @@ void Scanner::isString(char next){
             }
             file->get(next);
             strng += next;
-        }
-        else if(next == '\n'){
-            lineNum++;
         }
     }
     file->get(next);
@@ -146,12 +148,13 @@ void Scanner::isBlockComment(char next){
     while(next != '|' || file->peek() != '#'){
         file->get(next);
         BC += next;
+        if(next == '\n'){
+            lineNum++;
+            cout << BC << lineNum << endl;
+        }
         if (file->peek() == EOF){
             token.push_back(new Token(UNDEFINED, BC, startLineNum));
             return;
-        }
-        else if(next == '\n'){
-            lineNum++;
         }
     }
     file->get(next);
